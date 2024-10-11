@@ -127,6 +127,7 @@ class Medic(Hero):
                 hero.health += self.__heal_points
 
 
+
 class Witcher(Hero):
     def __init__(self, name, health, damage):
         super().__init__(name, health, 0, 'REVIVE')  # Witcher не наносит урон
@@ -135,10 +136,10 @@ class Witcher(Hero):
     def apply_super_power(self, boss, heroes_list):
         if not self.revive_used:
             for hero in heroes_list:
-                if hero.health <= 0:  # находим первого погибшего героя
+                if hero.health <= 0:
                     print(f'Witcher {self.name} жертвует собой, чтобы оживить {hero.name}.')
-                    hero.health = 100  # Оживляем героя с фиксированным количеством здоровья
-                    self.health = 0  # Witcher погибает
+                    hero.health = 100
+                    self.health = 0
                     self.revive_used = True
                     break
 
@@ -150,7 +151,7 @@ class Hacker(Hero):
 
     def apply_super_power(self, boss, heroes_list):
         self.round_counter += 1
-        if self.round_counter % 2 == 0:  # Каждые два раунда
+        if self.round_counter % 2 == 0:
             stolen_health = randint(30, 50)
             boss.health -= stolen_health
             random_hero = choice(heroes_list)
@@ -215,7 +216,7 @@ def play_round(boss, heroes_list):
 
 
 def start_game():
-    boss = Boss(name='Minotavr', health=1000, damage=50)
+    boss = Boss(name='Minotavr', health=8000, damage=50)
 
     warrior_1 = Warrior(name='Asterix', health=290, damage=10)
     warrior_2 = Warrior(name='Obelix', health=280, damage=15)
