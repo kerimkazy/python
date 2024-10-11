@@ -91,8 +91,11 @@ class Magic(Hero):
         super().__init__(name, health, damage, 'BOOST')
 
     def apply_super_power(self, boss, heroes_list):
-        # TODO here will be implementation of boosting
-        pass
+        boost_amount = randint(2, 5)
+        for hero in heroes_list:
+            if hero.health > 0:
+                hero.damage += boost_amount
+        print(f'Magic {self.name} увеличивает атаку всех героев на {boost_amount}.')
 
 
 class Berserk(Hero):
@@ -122,6 +125,56 @@ class Medic(Hero):
         for hero in heroes_list:
             if hero.health > 0 and hero != self:
                 hero.health += self.__heal_points
+
+
+class Witcher(Hero):
+    def __init__(self, name, health, damage):
+        super().__init__(name, health, 0, 'REVIVE')  # Witcher не наносит урон
+        self.revive_used = False
+
+    def apply_super_power(self, boss, heroes_list):
+        if not self.revive_used:
+            for hero in heroes_list:
+                if hero.health <= 0:  # находим первого погибшего героя
+                    print(f'Witcher {self.name} жертвует собой, чтобы оживить {hero.name}.')
+                    hero.health = 100  # Оживляем героя с фиксированным количеством здоровья
+                    self.health = 0  # Witcher погибает
+                    self.revive_used = True
+                    break
+
+
+class Hacker(Hero):
+    def __init__(self, name, health, damage):
+        super().__init__(name, health, damage, 'STEAL_HEALTH')
+        self.round_counter = 0
+
+    def apply_super_power(self, boss, heroes_list):
+        self.round_counter += 1
+        if self.round_counter % 2 == 0:  # Каждые два раунда
+            stolen_health = randint(30, 50)
+            boss.health -= stolen_health
+            random_hero = choice(heroes_list)
+            random_hero.health += stolen_health
+            print(f'Hacker {self.name} ворует {stolen_health} здоровья у босса и передает {random_hero.name}.')
+
+
+class Druid(Hero):
+    def __init__(self, name, health, damage):
+        super().__init__(name, health, damage, 'SUMMON')
+        self.summon_used = False
+
+    def apply_super_power(self, boss, heroes_list):
+        if not self.summon_used:
+            summon_choice = choice(['angel', 'raven'])
+            if summon_choice == 'angel':
+                for hero in heroes_list:
+                    if isinstance(hero, Medic):
+                        hero.heal_points += randint(10, 20)  # Увеличиваем лечение медика
+                print(f'Druid {self.name} призывает Ангела, который усиливает лечение медика.')
+            elif summon_choice == 'raven' and boss.health < boss.health * 0.5:
+                boss.damage += boss.damage * 0.5  # Увеличиваем урон босса на 50%
+                print(f'Druid {self.name} призывает Ворона, который увеличивает урон босса.')
+            self.summon_used = True
 
 
 round_number = 0
@@ -170,8 +223,11 @@ def start_game():
     berserk = Berserk(name='Guts', health=220, damage=10)
     doc = Medic(name='Doc', health=200, damage=5, heal_points=15)
     assistant = Medic(name='Junior', health=300, damage=5, heal_points=5)
+    witcher = Witcher(name='Geralt', health=250, damage=0)
+    hacker = Hacker(name='Neo', health=240, damage=5)
+    druid = Druid(name='Furion', health=280, damage=7)
 
-    heroes_list = [warrior_1, doc, warrior_2, magic, berserk, assistant]
+    heroes_list = [warrior_1, doc, warrior_2, magic, berserk, assistant, witcher, hacker, druid]
     show_statistics(boss, heroes_list)
 
     while not is_game_over(boss, heroes_list):
